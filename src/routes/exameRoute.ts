@@ -1,13 +1,17 @@
 import { Router } from "express"
 
+import ExameController from "../controller/Exame/ExameController"
+
 const exameRoute = Router()
 
-exameRoute.get('/exame', (req, res) => { return res.send('GET Exames') })
+exameRoute.get('/exame', ExameController.index)
 
-exameRoute.post('/exame', (req, res) => { return res.send('POST Exames') })
+exameRoute.get('/exame/:id', ExameController.findOne)
 
-exameRoute.put('/exame', (req, res) => { return res.send('PUT Exames') })
+exameRoute.post('/exame', ExameController.upsert)
 
-exameRoute.delete('/exame', (req, res) => { return res.send('DELETE Exames') })
+exameRoute.put('/exame', ExameController.upsert)
+
+exameRoute.delete('/exame/:id', ExameController.delete)
 
 export default exameRoute

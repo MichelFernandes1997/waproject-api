@@ -8,6 +8,8 @@ import routes from './routes'
 
 import process from 'process'
 
+import "./setup/mongo"
+
 if (process.env.ENV !== 'production') {
     require('dotenv').config()
 }
@@ -30,4 +32,8 @@ app.use(cors())
 
 app.use('/api/v1', routes)
 
-app.listen(process.env.PORT)
+const server = app.listen(process.env.PORT)
+
+process.on('SIGINT', () => {
+    server.close(() => console.log("Servidor encerrado!"))
+})

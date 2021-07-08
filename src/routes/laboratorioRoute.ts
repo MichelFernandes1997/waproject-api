@@ -1,13 +1,17 @@
 import { Router } from "express"
 
+import LaboratorioController from "../controller/Laboratorio/LaboratorioController"
+
 const laboratorioRoute = Router()
 
-laboratorioRoute.get('/laboratorio', (req, res) => { return res.send('GET Laboratorios\n'.repeat(2000)) })
+laboratorioRoute.get('/laboratorio', LaboratorioController.index)
 
-laboratorioRoute.post('/laboratorio', (req, res) => { return res.send('POST Laboratorio') })
+laboratorioRoute.get('/laboratorio/:id', LaboratorioController.findOne)
 
-laboratorioRoute.put('/laboratorio', (req, res) => { return res.send('PUT Laboratorio') })
+laboratorioRoute.post('/laboratorio', LaboratorioController.upsert)
 
-laboratorioRoute.delete('/laboratorio', (req, res) => { return res.send('DELETE Laboratorio') })
+laboratorioRoute.put('/laboratorio', LaboratorioController.upsert)
+
+laboratorioRoute.delete('/laboratorio/:id', LaboratorioController.delete)
 
 export default laboratorioRoute

@@ -1,4 +1,6 @@
-import { Router } from 'express'
+import "reflect-metadata"
+
+import { Request, Response, Router } from 'express'
 
 import exameRoute from './exameRoute'
 
@@ -6,7 +8,7 @@ import laboratorioRoute from './laboratorioRoute'
 
 const routes = Router()
 
-routes.get('/healthcheck', (req, res) => {
+routes.get('/healthcheck', (req: Request, res: Response) => {
     return res.send('Api are running"!')
 })
 
