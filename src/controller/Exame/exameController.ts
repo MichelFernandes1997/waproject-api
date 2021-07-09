@@ -6,7 +6,9 @@ import Exame from "../../entity/Exame"
 
 import Laboratorio from '../../entity/Laboratorio'
 
-// interface ValidateCreateExameInputs {
+import { transformStatusExam } from '../../helpers'
+
+// interface IValidateCreateExamesInputs {
 //     nome: {
 //         type: string
 //         value: any
@@ -32,22 +34,6 @@ interface IResponseExame {
     laboratorios: ILaboratorio[]
 }
 
-// const validateInputs = (inputs) => {
-//     let result = {}
-    
-//     Object.keys(inputs).map(key => {
-//         if (typeof inputs[key].value !== inputs[key].type) {
-//             result[key] = { error: `Erro de tipo: campo /${key}/ recebido possui o tipo /${typeof inputs[key].value}/, porém o tipo esperado é ${inputs[key].type}` }
-//         }
-//     })
-
-//     if (Object.keys(result).length === 0) {
-//         result = false
-//     }
-
-//     return result
-// }
-
 const ExameController = {
     async index (req: Request, res: Response) {
         try {
@@ -55,17 +41,7 @@ const ExameController = {
 
             const exames = await Exame.find().populate("laboratorios") as any
 
-            const responseExames = exames.map(item => {
-                return { 
-                    ...item._doc,
-                    status: item._doc.status ? 'ativo' : 'inativo',
-                    laboratorios: item._doc.laboratorios.length > 0
-                        ? item._doc.laboratorios.map(laboratorio => (
-                            { ...laboratorio._doc, status: laboratorio._doc.status ? 'ativo' : 'inativo' }
-                        ))
-                        : item._doc.laboratorios
-                }
-            }) as Array<IResponseExame>
+            const responseExames = transformStatusExam(exames) as Array<IResponseExame>
             
             if (!withTrashed) {
                 return res.send(responseExames.filter(item => item.status === 'ativo'))
@@ -73,54 +49,82 @@ const ExameController = {
                 return res.send(responseExames)
             }
         } catch (err) {
-            return res.status(err.code || err.status || err.statusCode || 500).json(err.message || err)
+            console.log(err)
+
+            return res.status(500).json(err.message || err)
         }
     },
     async findOne (req: Request, res: Response) {
         try {
             const { id: _id } = req.params
 
-            const exame = await Exame.findOne({ _id })
+            const exame = await Exame.findOne({ _id }).populate("laboratorios")
 
-            return res.send(exame)
+            const responseExame = transformStatusExam(exame)
+
+            return res.send(responseExame)
         } catch (err) {
-            return res.status(err.code || err.status || err.statusCode || 500).json(err.message || err)
+            console.log(err)
+
+            return res.status(500).json(err.message || err)
         }
     },
     async upsert (req: Request, res: Response) {
         try {
-            let { id, laboratorioId, removeLaboratorio, ...params } = req.body
+            let { id, laboratorioId, removerLaboratorio, ...params } = req.body
             
-            let exameInDb = await Exame.findOne({ _id: id }) as any
+            let exame = await Exame.findOne({ _id: id }) as any
             
             if (params) {
-                if (!exameInDb) {
-                    exameInDb = {}
+                if (!exame) {
+                    exame = {}
 
                     id = mongoose.Types.ObjectId()
                 }
 
                 Object.keys(params).map(key => {
-                    exameInDb[key] = params[key]
+                    exame[key] = params[key]
                 })
 
-                if (exameInDb.status !== false) {
-                    exameInDb.status = true
+                if (exame.status !== false) {
+                    exame.status = true
                 }
 
                 await Exame.updateOne(
                     { _id: id } ,
-                    exameInDb,
+                    exame,
                     {
                         upsert: true
                     }
                 )
+
+                exame = await Exame.findOne({ _id: id })
             }
 
             if (laboratorioId) {
+                const laboratorioAtivo = await Laboratorio.findOne({ _id: laboratorioId, status: true })
+
+                if (!laboratorioAtivo) {
+                    return res.status(400).send({ message: "Laboratorio inativo: por favor para vincular o laboratorio é necessário que o mesmo esteja ativo" })
+                }
+
+                if (!id) {
+                    if (exame) {
+                        id = exame._id
+                    } else {
+                        return res.status(400).send({ message: "Campo não encontrado: o campo /id/ do exame não foi encontrado no payload recebido" })
+                    }
+                }
+                
+                const exameAtivo = await Exame.findOne({ _id: id, status: true })
+
+                if (!exameAtivo) {
+                    return res.status(400).send({ message: "Exame inativo: por favor para vincular o exame à um laboratorio é necessário que o mesmo esteja ativo" })
+                }
+
                 const relationOperation = { exame: {}, laboratorio: {} } as any
 
-                if (removeLaboratorio) {
+                if (removerLaboratorio) {
                     relationOperation.exame.$pull = { laboratorios: laboratorioId }
 
                     relationOperation.laboratorio.$pull = { exames: id }
@@ -149,11 +153,15 @@ const ExameController = {
                 )
             }
 
-            const createdExame = await Exame.findOne({ _id: id })
+            const exameCriado = await Exame.findOne({ _id: id }).populate("laboratorios")
 
-            return res.json(createdExame)
+            const responseExame = transformStatusExam(exameCriado)
+
+            return res.json(responseExame)
         } catch (err) {
-            return res.status(err.code || err.status || err.statusCode || 500).json(err.message || err)
+            console.log(err)
+
+            return res.status(500).json(err.message || err)
         }
     },
     async delete (req: Request, res: Response) {
@@ -172,7 +180,9 @@ const ExameController = {
 
             return res.send({ message: `O Exame com /id/ igual à ${_id} foi removido com sucesso`})
         } catch (err) {
-            return res.status(err.code || err.status || err.statusCode || 500).json(err.message || err)
+            console.log(err)
+            
+            return res.status(500).json(err.message || err)
         }
     }
 }

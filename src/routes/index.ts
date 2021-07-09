@@ -1,5 +1,3 @@
-import "reflect-metadata"
-
 import { Request, Response, Router } from 'express'
 
 import exameRoute from './exameRoute'

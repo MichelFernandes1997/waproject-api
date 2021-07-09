@@ -6,8 +6,7 @@ services:
     container_name: waproject-mongo
     restart: always
     volumes:
-      - /data:/data/db
-      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+      - ./data/mongo/001_users.js:/docker-entrypoint-initdb.d/001_users.js:ro
     ports:
       - ${MONGO_PORT}:27017
     environment:

@@ -6,23 +6,14 @@ import Laboratorio from "../../entity/Laboratorio"
 
 import Exame from '../../entity/Exame'
 
+import { transformStatusLaboratory } from '../../helpers'
+
 // interface IValidateCreateLaboratorioInputs {
 //     nome: {
 //         type: string
 //         value: any
 //     },
 //     endereco: {
-//         type: string
-//         value: any
-//     }
-// }
-
-// interface IValidateExamesInputs {
-//     nome: {
-//         type: string
-//         value: any
-//     },
-//     tipo: {
 //         type: string
 //         value: any
 //     }
@@ -43,40 +34,14 @@ interface IResponseLaboratorio {
     exames: IExame[]
 }
 
-// const validateInputs = (inputs) => {
-//     let result = {}
-    
-//     Object.keys(inputs).map(key => {
-//         if (typeof inputs[key].value !== inputs[key].type) {
-//             result[key] = { error: `Erro de tipo: campo /${key}/ recebido possui o tipo /${typeof inputs[key].value}/, porém o tipo esperado é ${inputs[key].type}` }
-//         }
-//     })
-
-//     if (Object.keys(result).length === 0) {
-//         result = false
-//     }
-
-//     return result
-// }
-
 const LaboratorioController = {
     async index (req: Request, res: Response) {
         try {
             const { withTrashed } = req.query
-
+            
             const laboratorios = await Laboratorio.find().populate("exames") as any
             
-            const responseLaboratorios = laboratorios.map(item => {
-                return { 
-                    ...item._doc,
-                    status: item._doc.status ? 'ativo' : 'inativo',
-                    exames: item._doc.exames.length > 0
-                        ? item._doc.exames.map(exame => (
-                            { ...exame._doc, status: exame._doc.status ? 'ativo' : 'inativo' }
-                        ))
-                        : item._doc.exames
-                }
-            }) as Array<IResponseLaboratorio>
+            const responseLaboratorios = transformStatusLaboratory(laboratorios) as Array<IResponseLaboratorio>
             
             if (!withTrashed) {
                 return res.send(responseLaboratorios.filter(item => item.status === 'ativo'))
@@ -84,54 +49,82 @@ const LaboratorioController = {
                 return res.send(responseLaboratorios)
             }
         } catch (err) {
-            return res.status(err.code || err.status || err.statusCode || 500).json(err.message || err)
+            console.log(err)
+
+            return res.status(500).json(err.message || err)
         }
     },
     async findOne (req: Request, res: Response) {
         try {
             const { id: _id } = req.params
 
-            const laboratorio = await Laboratorio.findOne({ _id })
+            const laboratorio = await Laboratorio.findOne({ _id }).populate("exames")
 
-            return res.send(laboratorio)
+            const responseLaboratorio = transformStatusLaboratory(laboratorio)
+
+            return res.send(responseLaboratorio)
         } catch (err) {
-            return res.status(err.code || err.status || err.statusCode || 500).json(err.message || err)
+            console.log(err)
+
+            return res.status(500).json(err.message || err)
         }
     },
     async upsert (req: Request, res: Response) {
         try {
-            let { id, exameId, removeExame, ...params } = req.body
+            let { id, exameId, removerExame, ...params } = req.body
             
-            let productInDb = await Laboratorio.findOne({ _id: id }) as any
-            
+            let laboratorio = await Laboratorio.findOne({ _id: id }) as any
+
             if (params) {
-                if (!productInDb) {
-                    productInDb = {}
+                if (!laboratorio) {
+                    laboratorio = {}
 
                     id = mongoose.Types.ObjectId()
                 }
 
                 Object.keys(params).map(key => {
-                    productInDb[key] = params[key]
+                    laboratorio[key] = params[key]
                 })
 
-                if (productInDb.status !== false) {
-                    productInDb.status = true
+                if (laboratorio.status !== false) {
+                    laboratorio.status = true
                 }
 
                 await Laboratorio.updateOne(
                     { _id: id } ,
-                    productInDb,
+                    laboratorio,
                     {
                         upsert: true
                     }
                 )
+
+                laboratorio = await Laboratorio.findOne({ _id: id })
             }
 
             if (exameId) {
+                const exameAtivo = await Exame.findOne({ _id: exameId, status: true })
+
+                if (!exameAtivo) {
+                    return res.status(400).send({ message: "Exame inativo: por favor para vincular o exame é necessário que o mesmo esteja ativo" })
+                }
+
+                if (!id) {
+                    if (laboratorio) {
+                        id = laboratorio._id
+                    } else {
+                        return res.status(400).send({ message: "Campo não encontrado: o campo /id/ do laboratorio não foi encontrado no payload recebido" })
+                    }
+                }
+                
+                const labAtivo = await Laboratorio.findOne({ _id: id, status: true })
+
+                if (!labAtivo) {
+                    return res.status(400).send({ message: "Laboratorio inativo: por favor para vincular o laboratorio à um exame é necessário que o mesmo esteja ativo" })
+                }
+
                 const relationOperation = { laboratorio: {}, exame: {} } as any
 
-                if (removeExame) {
+                if (removerExame) {
                     relationOperation.laboratorio.$pull = { exames: exameId }
 
                     relationOperation.exame.$pull = { laboratorios: id }
@@ -160,11 +153,15 @@ const LaboratorioController = {
                 )
             }
 
-            const createdProduct = await Laboratorio.findOne({ _id: id })
+            const labCriado = await Laboratorio.findOne({ _id: id }).populate("exames")
+            
+            const responseLaboratorio = transformStatusLaboratory(labCriado)
 
-            return res.json(createdProduct)
+            return res.json(responseLaboratorio)
         } catch (err) {
-            return res.status(err.code || err.status || err.statusCode || 500).json(err.message || err)
+            console.log(err)
+
+            return res.status(500).json(err.message || err)
         }
     },
     async delete (req: Request, res: Response) {
@@ -183,7 +180,9 @@ const LaboratorioController = {
 
             return res.send({ message: `O laboratorio com /id/ igual à ${_id} foi removido com sucesso`})
         } catch (err) {
-            return res.status(err.code || err.status || err.statusCode || 500).json(err.message || err)
+            console.log(err)
+            
+            return res.status(500).json(err.message || err)
         }
     }
 }
