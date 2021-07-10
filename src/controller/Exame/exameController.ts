@@ -80,15 +80,21 @@ const ExameController = {
                     exame = {}
 
                     id = mongoose.Types.ObjectId()
+
+                    params.status = true
+                } else {
+                    if (params.status || params.status === false) {
+                        delete params.status
+    
+                        if (Object.keys(params).length === 0 && !laboratorioId) {
+                            return res.status(200).send({ message: "Nothing are received for update!" })
+                        }
+                    }
                 }
 
                 Object.keys(params).map(key => {
                     exame[key] = params[key]
                 })
-
-                if (exame.status !== false) {
-                    exame.status = true
-                }
 
                 await Exame.updateOne(
                     { _id: id } ,
@@ -172,19 +178,66 @@ const ExameController = {
                 return res.status(400).json({ message: 'Campo não encontrado: campo /id/ não foi enviado no payload para remoção' })
             }
 
-            const deletedExame = await Exame.deleteOne({ _id })
+            const exame = await Exame.findOne({ _id })
 
-            if (deletedExame.deletedCount === 0) {
+            if (!exame) {
                 return res.json({ message: "Nenhum exame foi deletado pois não foi encontrada nenhuma correspondência com o /id/ recebido!" })
             }
 
-            return res.send({ message: `O Exame com /id/ igual à ${_id} foi removido com sucesso`})
+            if (exame.status === false) {
+                return res.json({ message: "Nenhum exame foi deletado pois o exame encontrado com o /id/ recebido, já encontra-se removido!" })
+            }
+
+            exame.status = false
+
+            await Exame.updateOne(
+                { _id },
+                exame
+            )
+
+            return res.send({ message: `O exame com /id/ igual à ${_id} foi removido com sucesso`})
         } catch (err) {
             console.log(err)
             
             return res.status(500).json(err.message || err)
         }
-    }
+    },
+    async restore (req: Request, res: Response) {
+        try {
+            const { id: _id } = req.body
+            
+            if (!_id) {
+                return res.status(400).json({ message: 'Campo não encontrado: campo /id/ não foi enviado no payload para restauração' })
+            }
+
+            const exame = await Exame.findOne({ _id }).populate("laboratorios")
+            
+            if (!exame) {
+                return res.json({ message: "Nenhum exame foi restaurado pois não foi encontrada nenhuma correspondência com o /id/ recebido!" })
+            }
+
+            if (exame.status) {
+                return res.json({ message: "Nenhum exame foi restaurado pois o exame encontrado com o /id/ recebido, já encontra-se ativo!" })
+            }
+
+            exame.status = true
+            
+            await Exame.updateOne(
+                { _id },
+                exame
+            )
+
+            const exameRestaurado = await Exame.findOne({ _id }).populate("laboratorios")
+            
+            const responseExame = transformStatusExam(exameRestaurado)
+            
+            return res.json(responseExame)
+        } catch (err) {
+            console.log(err)
+            
+            return res.status(500).json(err.message || err)
+        }
+    } 
 }
 
 export default ExameController

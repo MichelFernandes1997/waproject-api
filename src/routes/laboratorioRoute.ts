@@ -14,4 +14,6 @@ laboratorioRoute.put('/laboratorio', LaboratorioController.upsert)
 
 laboratorioRoute.delete('/laboratorio/:id', LaboratorioController.delete)
 
+laboratorioRoute.put('/laboratorio/restore', LaboratorioController.restore)
+
 export default laboratorioRoute

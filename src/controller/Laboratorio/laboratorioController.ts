@@ -80,15 +80,21 @@ const LaboratorioController = {
                     laboratorio = {}
 
                     id = mongoose.Types.ObjectId()
+
+                    params.status = true
+                } else {
+                    if (params.status || params.status === false) {
+                        delete params.status
+    
+                        if (Object.keys(params).length === 0 && !exameId) {
+                            return res.status(200).send({ message: "Nothing are received for update!" })
+                        }
+                    }
                 }
 
                 Object.keys(params).map(key => {
                     laboratorio[key] = params[key]
                 })
-
-                if (laboratorio.status !== false) {
-                    laboratorio.status = true
-                }
 
                 await Laboratorio.updateOne(
                     { _id: id } ,
@@ -172,13 +178,60 @@ const LaboratorioController = {
                 return res.status(400).json({ message: 'Campo não encontrado: campo /id/ não foi enviado no payload para remoção' })
             }
 
-            const deletedLaboratorio = await Laboratorio.deleteOne({ _id })
+            const laboratorio = await Laboratorio.findOne({ _id })
 
-            if (deletedLaboratorio.deletedCount === 0) {
+            if (!laboratorio) {
                 return res.json({ message: "Nenhum laboratorio foi deletado pois não foi encontrada nenhuma correspondência com o /id/ recebido!" })
             }
 
+            if (laboratorio.status === false) {
+                return res.json({ message: "Nenhum laboratorio foi deletado pois o laboratorio encontrado com o /id/ recebido, já encontra-se removido!" })
+            }
+
+            laboratorio.status = false
+
+            await Laboratorio.updateOne(
+                { _id },
+                laboratorio
+            )
+
             return res.send({ message: `O laboratorio com /id/ igual à ${_id} foi removido com sucesso`})
+        } catch (err) {
+            console.log(err)
+            
+            return res.status(500).json(err.message || err)
+        }
+    },
+    async restore (req: Request, res: Response) {
+        try {
+            const { id: _id } = req.body
+            
+            if (!_id) {
+                return res.status(400).json({ message: 'Campo não encontrado: campo /id/ não foi enviado no payload para restauração' })
+            }
+
+            const laboratorio = await Laboratorio.findOne({ _id }).populate("exames")
+            
+            if (!laboratorio) {
+                return res.json({ message: "Nenhum laboratorio foi restaurado pois não foi encontrada nenhuma correspondência com o /id/ recebido!" })
+            }
+
+            if (laboratorio.status) {
+                return res.json({ message: "Nenhum laboratorio foi restaurado pois o laboratorio encontrado com o /id/ recebido, já encontra-se ativo!" })
+            }
+
+            laboratorio.status = true
+            
+            await Laboratorio.updateOne(
+                { _id },
+                laboratorio
+            )
+
+            const laboratorioRestaurado = await Laboratorio.findOne({ _id }).populate("exames")
+            
+            const responseLaboratorio = transformStatusLaboratory(laboratorioRestaurado)
+            
+            return res.json(responseLaboratorio)
         } catch (err) {
             console.log(err)
             

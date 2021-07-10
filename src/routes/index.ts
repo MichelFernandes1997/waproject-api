@@ -7,7 +7,7 @@ import laboratorioRoute from './laboratorioRoute'
 const routes = Router()
 
 routes.get('/healthcheck', (req: Request, res: Response) => {
-    return res.send('Api are running"!')
+    return res.send('Api are running!')
 })
 
 routes.use(exameRoute, laboratorioRoute)

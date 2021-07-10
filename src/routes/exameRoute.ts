@@ -14,4 +14,6 @@ exameRoute.put('/exame', ExameController.upsert)
 
 exameRoute.delete('/exame/:id', ExameController.delete)
 
+exameRoute.put('/exame/restore', ExameController.restore)
+
 export default exameRoute
