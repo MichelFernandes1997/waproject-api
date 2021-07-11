@@ -28,6 +28,42 @@
           "responses": {}
         }
       },
+      "/laboratorio/{id}": {
+        "get": {
+          "description": "Pegar um laboratorio baseado no ID enviado",
+          "operationId": "GETLABORATORIOONE",
+          "tags": [
+            "Laboratorio"
+          ],
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "description": "ID do laboratorio à ser encontrado",
+              "required": true,
+              "default": "mongoose.objectId()"
+            }
+          ],
+          "responses": {}
+        },
+        "delete": {
+          "description": "Deletar logicamente um laboratorio",
+          "operationId": "DELETELABORATORIO",
+          "tags": [
+            "Laboratorio"
+          ],
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "description": "ID do laboratorio",
+              "required": true,
+              "default": "mongoose.objectId()"
+            }
+          ],
+          "responses": {}
+        }
+      },
       "/laboratorio": {
         "get": {
           "description": "Pegar todos os laboratorios",
@@ -122,18 +158,37 @@
             }
           ],
           "responses": {}
-        },
-        "delete": {
-          "description": "Deletar logicamente um laboratorio",
-          "operationId": "DELETELABORATORIO",
+        }
+      },
+      "/exame/{id}": {
+        "get": {
+          "description": "Pegar um exame baseado no ID enviado",
+          "operationId": "GETEXAMEONE",
           "tags": [
-            "Laboratorio"
+            "Exame"
           ],
           "parameters": [
             {
               "name": "id",
               "in": "path",
-              "description": "ID do laboratorio",
+              "description": "ID do exame à ser encontrado",
+              "required": true,
+              "default": "mongoose.objectId()"
+            }
+          ],
+          "responses": {}
+        },
+        "delete": {
+          "description": "Deletar logicamente um exame",
+          "operationId": "DELETEEXAME",
+          "tags": [
+            "Exame"
+          ],
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "description": "ID do exame",
               "required": true,
               "default": ""
             }
@@ -232,23 +287,6 @@
                   }
                 }
               }
-            }
-          ],
-          "responses": {}
-        },
-        "delete": {
-          "description": "Deletar logicamente um exame",
-          "operationId": "DELETEEXAME",
-          "tags": [
-            "Exame"
-          ],
-          "parameters": [
-            {
-              "name": "id",
-              "in": "path",
-              "description": "ID do exame",
-              "required": true,
-              "default": ""
             }
           ],
           "responses": {}
