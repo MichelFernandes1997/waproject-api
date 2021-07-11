@@ -6,7 +6,7 @@ import laboratorioRoute from './laboratorioRoute'
 
 import swaggerUi from 'swagger-ui-express'
 
-import swaggerDocument from '../documentation/swagger.json'
+import swaggerDocument from '../doc/swagger.json'
 
 const routes = Router()
 

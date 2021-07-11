@@ -6,7 +6,8 @@ const laboratorioSchema: Schema = new mongoose.Schema(
     {
         nome: {
             type: String,
-            required: true
+            required: true,
+            unique: true
         },
         endereco: {
             type: String,
