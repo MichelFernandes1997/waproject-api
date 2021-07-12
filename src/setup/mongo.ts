@@ -8,9 +8,17 @@ if (process.env.NODE_ENV !== 'production') {
 
 const { MONGO_USERNAME, MONGO_PASSWORD, MONGO_HOST, LOCAL_MONGO_HOST, MONGO_PORT, MONGO_DATABASE } = process.env
 
+let url
+
+if (process.env.NODE_ENV === 'production') {
+    url = `mongodb+srv://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST}/${MONGO_DATABASE}?retryWrites=true&w=majority`
+} else {
+    url = `mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST}:${MONGO_PORT}`
+}
+
+
 mongoose.connect(
-    //`mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST}:${MONGO_PORT}`
-    `mongodb+srv://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST}/${MONGO_DATABASE}?retryWrites=true&w=majority`,
+    url,
     {
         useNewUrlParser: true,
         useUnifiedTopology: true

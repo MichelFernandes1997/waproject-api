@@ -6,18 +6,18 @@ import Exame from "../../entity/Exame"
 
 import Laboratorio from '../../entity/Laboratorio'
 
-import { transformStatusExam } from '../../helpers'
+import { transformStatusExam, validateInputs } from '../../helpers'
 
-// interface IValidateCreateExamesInputs {
-//     nome: {
-//         type: string
-//         value: any
-//     },
-//     tipo: {
-//         type: string
-//         value: any
-//     }
-// }
+interface IValidateCreateExamesInputs {
+    nome: {
+        type: string
+        value: any
+    },
+    tipo: {
+        type: string
+        value: any
+    }
+}
 
 interface ILaboratorio {
     id: ObjectId,
@@ -80,6 +80,23 @@ const ExameController = {
                     exame = {}
 
                     id = mongoose.Types.ObjectId()
+
+                    const inputs = {
+                        nome: {
+                            type: 'string',
+                            value: params.nome
+                        },
+                        tipo: {
+                            type: 'string',
+                            value: params.tipo
+                        }
+                    } as IValidateCreateExamesInputs
+
+                    const invalidInputs = validateInputs(inputs)
+
+                    if (invalidInputs) {
+                        return res.status(400).json({ errors: invalidInputs })
+                    }
 
                     params.status = true
                 } else {

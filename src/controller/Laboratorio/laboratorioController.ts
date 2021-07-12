@@ -6,18 +6,18 @@ import Laboratorio from "../../entity/Laboratorio"
 
 import Exame from '../../entity/Exame'
 
-import { transformStatusLaboratory } from '../../helpers'
+import { transformStatusLaboratory, validateInputs } from '../../helpers'
 
-// interface IValidateCreateLaboratorioInputs {
-//     nome: {
-//         type: string
-//         value: any
-//     },
-//     endereco: {
-//         type: string
-//         value: any
-//     }
-// }
+interface IValidateCreateLaboratorioInputs {
+    nome: {
+        type: string
+        value: any
+    },
+    endereco: {
+        type: string
+        value: any
+    }
+}
 
 interface IExame {
     id: ObjectId,
@@ -80,6 +80,23 @@ const LaboratorioController = {
                     laboratorio = {}
 
                     id = mongoose.Types.ObjectId()
+
+                    const inputs = {
+                        nome: {
+                            type: 'string',
+                            value: params.nome
+                        },
+                        endereco: {
+                            type: 'string',
+                            value: params.endereco
+                        }
+                    } as IValidateCreateLaboratorioInputs
+
+                    const invalidInputs = validateInputs(inputs)
+
+                    if (invalidInputs) {
+                        return res.status(400).json({ errors: invalidInputs })
+                    }
 
                     params.status = true
                 } else {
