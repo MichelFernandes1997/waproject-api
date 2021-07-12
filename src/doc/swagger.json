@@ -5,10 +5,10 @@
       "description": "Api da waproject",
       "version": "1.0"
     },
-    "host": "wa-project-api.herokuapp.com",
+    "host": "localhost:3333",
     "basePath": "/api/v1",
     "schemes": [
-      "https"
+      "http"
     ],
     "tags": [
       {
