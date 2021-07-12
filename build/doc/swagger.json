@@ -1,0 +1,296 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "WAPROJECT teste",
+        "description": "Api da waproject",
+        "version": "1.0"
+    },
+    "host": "localhost:3333",
+    "basePath": "/api/v1",
+    "schemes": [
+        "http"
+    ],
+    "tags": [
+        {
+            "name": "Laboratorio",
+            "description": "API de laboratorios"
+        }
+    ],
+    "paths": {
+        "/healthcheck": {
+            "get": {
+                "description": "Checar se Api está rodando",
+                "operationId": "HEALTHCHECK",
+                "tags": [
+                    "Health-check"
+                ],
+                "parameters": [],
+                "responses": {}
+            }
+        },
+        "/laboratorio/{id}": {
+            "get": {
+                "description": "Pegar um laboratorio baseado no ID enviado",
+                "operationId": "GETLABORATORIOONE",
+                "tags": [
+                    "Laboratorio"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID do laboratorio à ser encontrado",
+                        "required": true,
+                        "default": "mongoose.objectId()"
+                    }
+                ],
+                "responses": {}
+            },
+            "delete": {
+                "description": "Deletar logicamente um laboratorio",
+                "operationId": "DELETELABORATORIO",
+                "tags": [
+                    "Laboratorio"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID do laboratorio",
+                        "required": true,
+                        "default": "mongoose.objectId()"
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/laboratorio": {
+            "get": {
+                "description": "Pegar todos os laboratorios",
+                "operationId": "GETLABORATORIO",
+                "tags": [
+                    "Laboratorio"
+                ],
+                "parameters": [
+                    {
+                        "name": "withTrashed",
+                        "in": "headers",
+                        "description": "Variável que retorna todos os laboratorios sejam eles ativos ou inativos",
+                        "required": false,
+                        "default": false,
+                        "enum": [
+                            true,
+                            false
+                        ]
+                    }
+                ],
+                "responses": {}
+            },
+            "post": {
+                "description": "Criar laboratorio",
+                "operationId": "POSTLABORATORIO",
+                "tags": [
+                    "Laboratorio"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Objeto de laboratorio necessário para criar um novo laboratorio",
+                        "required": true,
+                        "schema": {
+                            "required": [
+                                "nome",
+                                "endereco"
+                            ],
+                            "properties": {
+                                "nome": {
+                                    "type": "string",
+                                    "example": "Laboratorio swagger"
+                                },
+                                "endereco": {
+                                    "type": "string",
+                                    "example": "Rua swagger, 3333"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {}
+            },
+            "put": {
+                "description": "Atualizar laboratorio",
+                "operationId": "PUTLABORATORIO",
+                "tags": [
+                    "Laboratorio"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Objeto de laboratorio necessário para atualizar um laboratorio existente",
+                        "required": true,
+                        "schema": {
+                            "required": [
+                                "id"
+                            ],
+                            "properties": {
+                                "id": {
+                                    "type": "string",
+                                    "example": "mongoose.ObjectId()"
+                                },
+                                "nome": {
+                                    "type": "string"
+                                },
+                                "endereco": {
+                                    "type": "string"
+                                },
+                                "exameId": {
+                                    "type": "string",
+                                    "example": "mongoose.ObjectId()"
+                                },
+                                "removerExame": {
+                                    "type": "boolean",
+                                    "example": false
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/exame/{id}": {
+            "get": {
+                "description": "Pegar um exame baseado no ID enviado",
+                "operationId": "GETEXAMEONE",
+                "tags": [
+                    "Exame"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID do exame à ser encontrado",
+                        "required": true,
+                        "default": "mongoose.objectId()"
+                    }
+                ],
+                "responses": {}
+            },
+            "delete": {
+                "description": "Deletar logicamente um exame",
+                "operationId": "DELETEEXAME",
+                "tags": [
+                    "Exame"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID do exame",
+                        "required": true,
+                        "default": ""
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/exame": {
+            "get": {
+                "description": "Pegar todos os exames",
+                "operationId": "GETEXAME",
+                "tags": [
+                    "Exame"
+                ],
+                "parameters": [
+                    {
+                        "name": "withTrashed",
+                        "in": "headers",
+                        "description": "Variável que retorna todos os exame sejam eles ativos ou inativos",
+                        "required": false,
+                        "default": false,
+                        "enum": [
+                            true,
+                            false
+                        ]
+                    }
+                ],
+                "responses": {}
+            },
+            "post": {
+                "description": "Criar exame",
+                "operationId": "POSTEXAME",
+                "tags": [
+                    "Exame"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Objeto de exame necessário para criar um novo exame",
+                        "required": true,
+                        "schema": {
+                            "required": [
+                                "nome",
+                                "tipo"
+                            ],
+                            "properties": {
+                                "nome": {
+                                    "type": "string",
+                                    "example": "Exame de swagger"
+                                },
+                                "tipo": {
+                                    "type": "string",
+                                    "example": "analise clinica"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {}
+            },
+            "put": {
+                "description": "Atualizar exame",
+                "operationId": "PUTEXAME",
+                "tags": [
+                    "Exame"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Objeto de exame necessário para atualizar um exame existente",
+                        "required": true,
+                        "schema": {
+                            "required": [
+                                "id"
+                            ],
+                            "properties": {
+                                "id": {
+                                    "type": "string",
+                                    "example": "mongoose.ObjectId()"
+                                },
+                                "nome": {
+                                    "type": "string"
+                                },
+                                "tipo": {
+                                    "type": "string"
+                                },
+                                "laboratorioId": {
+                                    "type": "string",
+                                    "example": "mongoose.ObjectId()"
+                                },
+                                "removerLaboratorio": {
+                                    "type": "boolean",
+                                    "example": false
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        }
+    }
+}
