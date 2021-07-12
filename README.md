@@ -8,7 +8,7 @@ ENV=development
 
 PORT=3333
 
-MONGO_HOST=waproject-mongo
+MONGO_HOST=waproject-mongo\n
 MONGO_PORT=27017
 MONGO_DATABASE=wa-api
 MONGO_USERNAME=wa-user-api
