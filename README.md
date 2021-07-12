@@ -24,4 +24,4 @@ MONGO_PASSWORD=teste123api
 
 ### Execute the command: docker-compose --env-file .env config
 
-### Execute the command: docker-compose compose up -d
+### Execute the command: docker-compose up -d
