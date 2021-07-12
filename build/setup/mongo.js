@@ -9,9 +9,14 @@ if (process_1.default.env.NODE_ENV !== 'production') {
     require('dotenv').config();
 }
 var _a = process_1.default.env, MONGO_USERNAME = _a.MONGO_USERNAME, MONGO_PASSWORD = _a.MONGO_PASSWORD, MONGO_HOST = _a.MONGO_HOST, LOCAL_MONGO_HOST = _a.LOCAL_MONGO_HOST, MONGO_PORT = _a.MONGO_PORT, MONGO_DATABASE = _a.MONGO_DATABASE;
-mongoose_1.default.connect(
-//`mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST}:${MONGO_PORT}`
-"mongodb+srv://" + MONGO_USERNAME + ":" + MONGO_PASSWORD + "@" + MONGO_HOST + "/" + MONGO_DATABASE + "?retryWrites=true&w=majority", {
+var url;
+if (process_1.default.env.NODE_ENV === 'production') {
+    url = "mongodb+srv://" + MONGO_USERNAME + ":" + MONGO_PASSWORD + "@" + MONGO_HOST + "/" + MONGO_DATABASE + "?retryWrites=true&w=majority";
+}
+else {
+    url = "mongodb://" + MONGO_USERNAME + ":" + MONGO_PASSWORD + "@" + MONGO_HOST + ":" + MONGO_PORT;
+}
+mongoose_1.default.connect(url, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 });

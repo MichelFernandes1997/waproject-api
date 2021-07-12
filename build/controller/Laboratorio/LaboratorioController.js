@@ -104,7 +104,7 @@ var LaboratorioController = {
     },
     upsert: function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
-            var _a, id, exameId, removerExame, params_1, laboratorio_1, exameAtivo, labAtivo, relationOperation, labCriado, responseLaboratorio, err_3;
+            var _a, id, exameId, removerExame, params_1, laboratorio_1, inputs, invalidInputs, exameAtivo, labAtivo, relationOperation, labCriado, responseLaboratorio, err_3;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
@@ -117,6 +117,20 @@ var LaboratorioController = {
                         if (!laboratorio_1) {
                             laboratorio_1 = {};
                             id = mongoose_1.default.Types.ObjectId();
+                            inputs = {
+                                nome: {
+                                    type: 'string',
+                                    value: params_1.nome
+                                },
+                                endereco: {
+                                    type: 'string',
+                                    value: params_1.endereco
+                                }
+                            };
+                            invalidInputs = helpers_1.validateInputs(inputs);
+                            if (invalidInputs) {
+                                return [2 /*return*/, res.status(400).json({ errors: invalidInputs })];
+                            }
                             params_1.status = true;
                         }
                         else {

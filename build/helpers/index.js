@@ -46,8 +46,13 @@ exports.transformStatusExam = function (payload) {
 exports.validateInputs = function (inputs) {
     var result = {};
     Object.keys(inputs).map(function (key) {
-        if (typeof inputs[key].value !== inputs[key].type) {
-            result[key] = { error: "Erro de tipo: campo /" + key + "/ recebido possui o tipo /" + typeof inputs[key].value + "/, por\u00E9m o tipo esperado \u00E9 " + inputs[key].type };
+        if (inputs[key].value || inputs[key].value === false) {
+            if (typeof inputs[key].value !== inputs[key].type) {
+                result[key] = { error: "Erro de tipo: campo /" + key + "/ recebido possui o tipo /" + typeof inputs[key].value + "/, por\u00E9m o tipo esperado \u00E9 " + inputs[key].type };
+            }
+        }
+        else {
+            result[key] = { error: "Erro de campo n\u00E3o encontrado: campo /" + key + "/ n\u00E3o foi encontrado no payload recebido e o mesmo \u00E9 obrigat\u00F3rio" };
         }
     });
     if (Object.keys(result).length === 0) {
