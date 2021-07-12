@@ -1,11 +1,11 @@
 {
    "name": "wa-project-api",
    "version": "1.0.0",
-   "main": "index.js",
+   "main": "build/index.js",
    "license": "MIT",
    "type": "module",
    "scripts": {
-      "start": "node build/src/index.js",
+      "start": "node build/index.js",
       "dev": "tsnd --poll --respawn --transpile-only ./src/index.ts",
       "test": "jest"
    },
