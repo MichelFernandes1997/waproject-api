@@ -8,7 +8,7 @@
     "host": "wa-project-api.herokuapp.com",
     "basePath": "/api/v1",
     "schemes": [
-        "http"
+        "https"
     ],
     "tags": [
         {
