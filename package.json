@@ -4,7 +4,7 @@
    "main": "build/index.js",
    "license": "MIT",
    "scripts": {
-      "postinstall": "tsc && mv -i -v public build/ && rm -v -rf src",
+      "postinstall": "tsc",
       "start": "tsc && node build/index.js",
       "dev": "tsnd --poll --respawn --transpile-only ./src/index.ts"
    },
