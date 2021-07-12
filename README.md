@@ -8,10 +8,14 @@ ENV=development
 
 PORT=3333
 
-MONGO_HOST=waproject-mongo\n
+MONGO_HOST=waproject-mongo
+
 MONGO_PORT=27017
+
 MONGO_DATABASE=wa-api
+
 MONGO_USERNAME=wa-user-api
+
 MONGO_PASSWORD=teste123api
 
 ### After that, save the file and go to next step
