@@ -9,8 +9,8 @@ if (process.env.NODE_ENV !== 'production') {
 const { MONGO_USERNAME, MONGO_PASSWORD, MONGO_HOST, LOCAL_MONGO_HOST, MONGO_PORT, MONGO_DATABASE } = process.env
 
 mongoose.connect(
-    `mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST}:${MONGO_PORT}`
-    /*`mongodb+srv://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST}/${MONGO_DATABASE}?authSource=admin`*/,
+    //`mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST}:${MONGO_PORT}`
+    `mongodb+srv://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST}/${MONGO_DATABASE}?retryWrites=true&w=majority`,
     {
         useNewUrlParser: true,
         useUnifiedTopology: true

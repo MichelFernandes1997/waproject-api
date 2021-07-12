@@ -5,7 +5,7 @@
    "license": "MIT",
    "type": "module",
    "scripts": {
-      "start": "ts-node src/index.ts",
+      "start": "node build/index.js",
       "dev": "tsnd --poll --respawn --transpile-only ./src/index.ts",
       "test": "jest"
    },
