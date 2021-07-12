@@ -17,7 +17,7 @@ mongoose.connect(
     }
 )
 
-mongoose.connection.on('error', () => console.error('Connection error:', `mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST}:${MONGO_PORT}`))
+mongoose.connection.on('error', () => console.error('Connection error:'))
 
 mongoose.connection.once('open', () => console.log('Database connected!'))
 
