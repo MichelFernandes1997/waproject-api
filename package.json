@@ -4,7 +4,7 @@
    "main": "build/index.js",
    "license": "MIT",
    "scripts": {
-      "start": "node build/index.js",
+      "start": "yarn tsc && node build/index.js",
       "dev": "tsnd --poll --respawn --transpile-only ./src/index.ts"
    },
    "dependencies": {
